@@ -1,4 +1,5 @@
-import { compare, hash } from "../../context/security/encrypter";
+import { hash } from "../../context/security/encrypter";
+import { compare } from "bcrypt";
 import Usuario from "../domain/Usuario";
 import UsuarioRepository from "../domain/Usuario.Repository";
 
@@ -9,24 +10,29 @@ export default class UsuarioUseCases{
         this.usuarioRepository = usuarioRepository;
     }
 
-/*     async register(usuario: Usuario): Promise<Usuario> {
-        const password = usuario.password ? hash(usuario.password) : undefined;
-        return await this.usuarioRepository.register({
-          ...usuario,
-          password,
-        });
-      } */
-    
-      async login(usuario: Usuario): Promise<Usuario> {
-        const stored = await this.usuarioRepository.login(usuario);
-        if (
-          !stored ||
-          usuario.password === "" ||
-          stored.password === "" ||
-          !compare(usuario.password || "", stored.password || "")
-        )
-          throw new Error("User not found or password incorrect");
-        else return stored;
-      }
+    async registro(usuario: Usuario): Promise<Usuario> {
+      if (!usuario.password){
+        throw new Error("Falta password");
+      } 
+      const cifrada = hash(usuario.password);
+      usuario.password = cifrada;
+      return this.usuarioRepository.registro(usuario);
+    }
 
+    async login(usuario: Usuario): Promise<Usuario> {
+      if (!usuario.password){
+        throw new Error("Falta password");
+      } 
+      const usuarioBD = await this.usuarioRepository.login(usuario);
+      if (!usuarioBD){
+        throw new Error("Usuario no encontrado");
+      }
+      const iguales = await compare(String(usuario.password), String(usuarioBD.password));
+      if (iguales) {
+        return usuarioBD;
+      } else {
+        throw new Error("Usuario/contraseña no es correcto");
+      }
+    }
+  
 }

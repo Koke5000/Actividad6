@@ -1,6 +1,6 @@
 import Usuario from "./Usuario";
 
 export default interface UsuarioRepository {
-    register(user: Usuario): Promise<Usuario>;
-    login(user: Usuario): Promise<Usuario>;
+    registro(usuario: Usuario): Promise<Usuario>;
+    login(usuario: Usuario): Promise<Usuario>;
 }

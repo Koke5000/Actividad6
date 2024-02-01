@@ -1,5 +1,9 @@
+import Videojuego from "../../videojuegos/domain/Videojuego";
+
 export default interface Usuario{
-    id: number,
+    id?: number,
     nombre: string,
-    password: string
+    password: string,
+    compras?: Videojuego[];
+    carrito?: Videojuego[];
 }
